@@ -1,0 +1,216 @@
+/*
+ * =====================================================
+ * EXEMPLE DE THÈME CLIENT
+ * theme-example.css — Surcharge : "Traiteur Aminata"
+ * =====================================================
+ *
+ * Ce fichier montre comment un traiteur personnalise
+ * l'apparence complète du SaaS en surchargeant les
+ * variables CSS de tokens.css.
+ *
+ * Pour activer ce thème :
+ *   1. Importer ce fichier APRÈS tokens.css et components.css
+ *   2. Ou l'appliquer dynamiquement sur l'élément <html> :
+ *        document.documentElement.dataset.clientTheme = "aminata"
+ *
+ * Pour désactiver : commenter l'import dans index.html
+ *
+ * CHAQUE CLIENT A SON PROPRE FICHIER DE SURCHARGE.
+ * Les équipes produit ne modifient jamais tokens.css
+ * pour un client spécifique.
+ * =====================================================
+ */
+
+/*
+ * Thème : Traiteur Aminata
+ * Couleurs inspirées du voile indigo du Sénégal
+ * et du tissu wax doré.
+ * Police : Georgia pour l'élégance, Inter pour le corps
+ */
+:root,
+[data-client="aminata"] {
+
+  /* ===================================================
+   * IDENTITÉ DE L'ENTREPRISE
+   * =================================================== */
+
+  --brand-name:           "Traiteur Aminata";
+  --logo-url:             none; /* Remplacer par : url('/clients/aminata/logo.svg') */
+  --logo-width:           140px;
+  --logo-height:          48px;
+
+  /* ===================================================
+   * COULEURS DE MARQUE PERSONNALISÉES
+   * Inspiration : indigo sénégalais + or wax
+   * =================================================== */
+
+  /* Primaire — Indigo profond */
+  --color-primary:          #3D2E8C;
+  --color-primary-dark:     #2A1F63;
+  --color-primary-light:    #6A58C7;
+  --color-primary-50:       #F0EEF9;
+  --color-primary-100:      #C8C2EE;
+
+  /* Secondaire — Or wax chaud */
+  --color-secondary:        #D4A017;
+  --color-secondary-dark:   #A87D0E;
+  --color-secondary-light:  #E8C460;
+  --color-secondary-50:     #FDF7E3;
+  --color-secondary-100:    #F5E0A0;
+
+  /* ===================================================
+   * COULEURS NEUTRES PERSONNALISÉES
+   * Fond légèrement chaud (écru) plutôt que gris froid
+   * =================================================== */
+
+  --color-background:       #FAFAF7;
+  --color-surface:          #FFFFFF;
+  --color-surface-alt:      #F5F4F0;
+  --color-border:           #E8E4D8;
+  --color-border-strong:    #C8C2AE;
+
+  /* Texte légèrement brun plutôt que bleu-gris */
+  --color-text-primary:     #1C1810;
+  --color-text-secondary:   #4A4030;
+  --color-text-muted:       #7A6E5A;
+
+  /* ===================================================
+   * TYPOGRAPHIE PERSONNALISÉE
+   * =================================================== */
+
+  /* Police de marque : Georgia pour les titres */
+  --font-family-brand:      'Georgia', 'Times New Roman', serif;
+
+  /* Corps du texte reste Inter pour la lisibilité UI */
+  --font-family-body:       'Inter', 'Segoe UI', system-ui, sans-serif;
+
+  /* ===================================================
+   * RADIUS PERSONNALISÉS
+   * Style plus arrondi, doux et artisanal
+   * =================================================== */
+
+  --radius-sm:    0.375rem;   /* 6px  */
+  --radius-md:    0.625rem;   /* 10px */
+  --radius-lg:    1rem;       /* 16px */
+  --radius-xl:    1.25rem;    /* 20px */
+
+  /* ===================================================
+   * OMBRES LÉGÈREMENT TEINTÉES
+   * =================================================== */
+
+  --shadow-sm:    0 1px 3px 0 rgba(28, 24, 16, 0.08);
+  --shadow-md:    0 4px 8px -2px rgba(28, 24, 16, 0.12),
+                  0 2px 4px -1px rgba(28, 24, 16, 0.06);
+  --shadow-lg:    0 12px 20px -4px rgba(28, 24, 16, 0.14),
+                  0 4px 8px -2px rgba(28, 24, 16, 0.06);
+
+  /* Focus doré pour correspondre à la marque */
+  --shadow-focus: 0 0 0 3px rgba(212, 160, 23, 0.35);
+
+  /* ===================================================
+   * STATUTS — légèrement adaptés à la palette
+   * (maintien du code couleur standard pour la lisibilité)
+   * =================================================== */
+
+  /* Les statuts gardent leurs valeurs sémantiques,
+     seule la police change via --font-family-body */
+}
+
+/*
+ * Surcharges spécifiques pour les composants
+ * quand le thème Aminata est actif
+ */
+
+/* Logo Aminata : monogramme stylisé si pas d'image */
+[data-client="aminata"] .login-form__logo-fallback,
+[data-client="aminata"] .app-header__logo {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  font-family: var(--font-family-brand);
+  font-style: italic;
+}
+
+/* Titres en police de marque */
+[data-client="aminata"] .login-form__brand-name,
+[data-client="aminata"] .app-header__name,
+[data-client="aminata"] .demo-section__title,
+[data-client="aminata"] .order-card__client-name {
+  font-family: var(--font-family-brand);
+}
+
+/* Bouton primaire avec dégradé subtil pour Aminata */
+[data-client="aminata"] .btn--primary {
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  border-color: var(--color-primary);
+}
+
+[data-client="aminata"] .btn--primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary));
+  border-color: var(--color-primary-dark);
+}
+
+/* Carte de commande avec bordure top colorée */
+[data-client="aminata"] .order-card {
+  border-top: 3px solid var(--color-secondary);
+}
+
+/* En-tête de carte légèrement dorée */
+[data-client="aminata"] .order-card__header {
+  background: linear-gradient(to right, var(--color-secondary-50), var(--color-surface-alt));
+}
+
+/* Focus doré */
+[data-client="aminata"] :focus-visible {
+  outline-color: var(--color-secondary);
+}
+
+[data-client="aminata"] .form-input:focus,
+[data-client="aminata"] .form-select:focus,
+[data-client="aminata"] .search-input:focus,
+[data-client="aminata"] .status-filter:focus {
+  border-color: var(--color-secondary);
+  box-shadow: 0 0 0 3px rgba(212, 160, 23, 0.2);
+}
+
+/* Numéro de page actif en couleur secondaire */
+[data-client="aminata"] .page-btn[aria-current="page"] {
+  background-color: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: var(--color-text-inverse);
+}
+
+/*
+ * =====================================================
+ * MODÈLE DE DOCUMENTATION CLIENT
+ * =====================================================
+ *
+ * Pour créer le thème d'un nouveau client :
+ *
+ * 1. Copier ce fichier → theme-[nom-client].css
+ *
+ * 2. Modifier ces variables minimum :
+ *    --brand-name       Nom de l'entreprise
+ *    --logo-url         URL du logo (format SVG recommandé)
+ *    --color-primary    Couleur principale de la marque
+ *    --color-secondary  Couleur d'accentuation
+ *
+ * 3. Optionnel (si la marque le demande) :
+ *    --font-family-brand  Police des titres
+ *    --radius-*           Style anguleux ou arrondi
+ *    --color-background   Fond légèrement teinté
+ *
+ * 4. Vérifier les contrastes WCAG AA :
+ *    - Texte normal (< 18px) : ratio >= 4.5:1
+ *    - Grand texte (>= 18px) : ratio >= 3:1
+ *    - Utiliser https://webaim.org/resources/contrastchecker/
+ *
+ * 5. Tester sur mobile 375px (iPhone SE)
+ *
+ * EXEMPLES DE PALETTES POUR TRAITEURS SÉNÉGALAIS :
+ *
+ *   Traiteur Dakar Prestige → Bordeaux #8B1A1A + Or #C5A028
+ *   Catering Maam Binta     → Vert kola #2D6A4F + Terracotta #C96B3A
+ *   Buffets du Saloum       → Bleu mer #1B5E90 + Sable #D4B483
+ *   Royal Thiébou           → Pourpre #6B2D6B + Jade #2E8B57
+ *
+ * =====================================================
+ */

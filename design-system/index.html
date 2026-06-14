@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Système de design — SaaS de gestion de commandes pour traiteurs au Sénégal">
+  <title>Système de design — TraiteurPro</title>
+
+  <!-- Tokens CSS (variables de base — toujours requis) -->
+  <link rel="stylesheet" href="tokens.css">
+
+  <!--
+    Thème client (décommenter pour activer "Traiteur Aminata")
+    Supprimer ou commenter pour revenir au thème par défaut
+  -->
+  <!-- <link rel="stylesheet" href="theme-example.css"> -->
+
+  <!-- Composants -->
+  <link rel="stylesheet" href="components.css">
+
+  <!-- Google Fonts — Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* Styles spécifiques à la page de démonstration */
+    .demo-page {
+      min-height: 100vh;
+      background-color: var(--color-background);
+    }
+
+    .demo-intro {
+      background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-surface) 60%);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--space-8) 0 var(--space-10);
+    }
+
+    .demo-intro__title {
+      font-family: var(--font-family-brand);
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-text-primary);
+      line-height: var(--line-height-tight);
+      margin-bottom: var(--space-2);
+    }
+
+    @media (min-width: 768px) {
+      .demo-intro__title {
+        font-size: calc(var(--font-size-2xl) * 1.3);
+      }
+    }
+
+    .demo-intro__subtitle {
+      font-size: var(--font-size-base);
+      color: var(--color-text-muted);
+      line-height: var(--line-height-relaxed);
+      max-width: 520px;
+    }
+
+    .demo-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-6);
+    }
+
+    .demo-meta__tag {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-primary);
+      background-color: var(--color-primary-50);
+      border: 1px solid var(--color-primary-100);
+      border-radius: var(--radius-full);
+    }
+
+    .demo-nav {
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .demo-nav__list {
+      display: flex;
+      list-style: none;
+      gap: 0;
+      padding: 0 var(--space-4);
+      white-space: nowrap;
+    }
+
+    .demo-nav__item a {
+      display: block;
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-muted);
+      text-decoration: none;
+      border-bottom: 2px solid transparent;
+      transition:
+        color var(--transition-fast),
+        border-color var(--transition-fast);
+    }
+
+    .demo-nav__item a:hover {
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
+      text-decoration: none;
+    }
+
+    .demo-nav__item a:focus-visible {
+      outline: 2px solid var(--color-primary);
+      outline-offset: -2px;
+    }
+
+    .demo-main {
+      padding-bottom: var(--space-16);
+    }
+
+    /* Grille de swatches couleurs */
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--space-3);
+    }
+
+    @media (min-width: 480px) {
+      .color-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (min-width: 768px) {
+      .color-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .color-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+
+    /* Grille typo */
+    .type-scale {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .type-scale__item {
+      display: flex;
+      align-items: baseline;
+      gap: var(--space-4);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .type-scale__item:last-child {
+      border-bottom: none;
+    }
+
+    .type-scale__label {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    /* Grille d'espacement */
+    .space-scale {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .space-scale__item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .space-scale__bar {
+      background-color: var(--color-primary);
+      height: 20px;
+      border-radius: var(--radius-sm);
+      opacity: 0.7;
+    }
+
+    .space-scale__label {
+      font-family: var(--font-family-mono);
+      font-size: var(--font-size-xs);
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    /* Carte centrée pour login demo */
+    .demo-login-wrapper {
+      display: flex;
+      justify-content: center;
+      background-color: var(--color-background);
+      padding: var(--space-8) var(--space-4);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--color-border);
+    }
+
+    /* Wrapper tableau de démo */
+    .demo-table-section {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .demo-table-section__header {
+      padding: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      background-color: var(--color-surface-alt);
+    }
+
+    .demo-table-section__title {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-secondary);
+    }
+  </style>
+</head>
+
+<body class="demo-page">
+
+  <!-- =====================================================
+       EN-TÊTE GLOBAL DE L'APPLICATION
+       ===================================================== -->
+  <header class="app-header" role="banner">
+    <div class="app-header__inner">
+      <a href="#" class="app-header__brand" aria-label="Accueil TraiteurPro">
+        <div class="app-header__logo" aria-hidden="true">TP</div>
+        <span class="app-header__name">TraiteurPro</span>
+      </a>
+
+      <div class="app-header__actions">
+        <!-- Sélecteur de thème clair / sombre -->
+        <button
+          class="theme-toggle"
+          id="theme-toggle"
+          aria-label="Basculer le thème clair/sombre"
+          aria-pressed="false"
+        >
+          <span class="theme-toggle__icon" aria-hidden="true" id="theme-icon">
+            <!-- Icône lune -->
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+            </svg>
+          </span>
+          <span id="theme-label">Mode sombre</span>
+        </button>
+
+        <!-- Sélecteur de thème client (démo) -->
+        <select
+          id="client-theme"
+          class="status-filter"
+          aria-label="Choisir un thème client"
+          style="min-width: 160px;"
+        >
+          <option value="">Thème par défaut</option>
+          <option value="aminata">Traiteur Aminata</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- =====================================================
+       INTRODUCTION
+       ===================================================== -->
+  <section class="demo-intro" aria-labelledby="intro-title">
+    <div class="container">
+      <h1 class="demo-intro__title" id="intro-title">
+        Système de design<br>TraiteurPro
+      </h1>
+      <p class="demo-intro__subtitle">
+        Bibliothèque de composants mobile-first pour la gestion
+        de commandes de traiteurs au Sénégal.
+        Entièrement personnalisable par client via des variables CSS.
+      </p>
+      <div class="demo-meta" role="list" aria-label="Caractéristiques">
+        <span class="demo-meta__tag" role="listitem">CSS pur — aucun framework</span>
+        <span class="demo-meta__tag" role="listitem">Mobile-first</span>
+        <span class="demo-meta__tag" role="listitem">WCAG AA</span>
+        <span class="demo-meta__tag" role="listitem">Thème par client</span>
+        <span class="demo-meta__tag" role="listitem">Mode sombre</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation de la démo -->
+  <nav class="demo-nav" aria-label="Sections de la démo">
+    <ul class="demo-nav__list" role="list">
+      <li class="demo-nav__item"><a href="#tokens-couleurs">Couleurs</a></li>
+      <li class="demo-nav__item"><a href="#tokens-typo">Typographie</a></li>
+      <li class="demo-nav__item"><a href="#tokens-espacement">Espacement</a></li>
+      <li class="demo-nav__item"><a href="#composant-badges">Badges</a></li>
+      <li class="demo-nav__item"><a href="#composant-boutons">Boutons</a></li>
+      <li class="demo-nav__item"><a href="#composant-formulaires">Champs</a></li>
+      <li class="demo-nav__item"><a href="#composant-cartes">Cartes</a></li>
+      <li class="demo-nav__item"><a href="#composant-connexion">Connexion</a></li>
+      <li class="demo-nav__item"><a href="#composant-tableau">Tableau</a></li>
+    </ul>
+  </nav>
+
+  <!-- =====================================================
+       CONTENU PRINCIPAL
+       ===================================================== -->
+  <main class="demo-main" id="main-content">
+    <div class="container">
+
+      <!-- =====================================================
+           SECTION 1 : TOKENS — COULEURS
+           ===================================================== -->
+      <section class="demo-section" id="tokens-couleurs" aria-labelledby="section-colors-title">
+        <h2 class="demo-section__title" id="section-colors-title">Couleurs</h2>
+        <p class="demo-section__description">
+          Palette complète pilotée par variables CSS. Chaque couleur existe
+          en version principale, sombre, claire et 50 (fond très léger).
+        </p>
+
+        <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-3);">Couleurs de marque</h3>
+        <div class="color-grid" style="margin-bottom: var(--space-6);">
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-primary);" role="img" aria-label="Couleur primaire"></div>
+            <div class="token-swatch__label">--color-primary</div>
+            <div class="token-swatch__value">#2B5BA8</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-primary-dark);"></div>
+            <div class="token-swatch__label">--color-primary-dark</div>
+            <div class="token-swatch__value">#1E3F7A</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-primary-light);"></div>
+            <div class="token-swatch__label">--color-primary-light</div>
+            <div class="token-swatch__value">#5B8DD4</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-secondary);"></div>
+            <div class="token-swatch__label">--color-secondary</div>
+            <div class="token-swatch__value">#E8722A</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-secondary-dark);"></div>
+            <div class="token-swatch__label">--color-secondary-dark</div>
+            <div class="token-swatch__value">#BE5518</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-secondary-light);"></div>
+            <div class="token-swatch__label">--color-secondary-light</div>
+            <div class="token-swatch__value">#F09860</div>
+          </div>
+        </div>
+
+        <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-3);">Couleurs neutres &amp; surfaces</h3>
+        <div class="color-grid" style="margin-bottom: var(--space-6);">
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-background); border: 1px solid var(--color-border);"></div>
+            <div class="token-swatch__label">--color-background</div>
+            <div class="token-swatch__value">#F8F9FA</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-surface); border: 1px solid var(--color-border);"></div>
+            <div class="token-swatch__label">--color-surface</div>
+            <div class="token-swatch__value">#FFFFFF</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-border);"></div>
+            <div class="token-swatch__label">--color-border</div>
+            <div class="token-swatch__value">#E2E6EA</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-text-primary);"></div>
+            <div class="token-swatch__label">--color-text-primary</div>
+            <div class="token-swatch__value">#1A1F2E</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-text-secondary);"></div>
+            <div class="token-swatch__label">--color-text-secondary</div>
+            <div class="token-swatch__value">#4A5568</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-text-muted);"></div>
+            <div class="token-swatch__label">--color-text-muted</div>
+            <div class="token-swatch__value">#718096</div>
+          </div>
+        </div>
+
+        <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-3);">Couleurs sémantiques</h3>
+        <div class="color-grid" style="margin-bottom: var(--space-6);">
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-success);"></div>
+            <div class="token-swatch__label">--color-success</div>
+            <div class="token-swatch__value">#1A7F4B</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-warning);"></div>
+            <div class="token-swatch__label">--color-warning</div>
+            <div class="token-swatch__value">#B45309</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-error);"></div>
+            <div class="token-swatch__label">--color-error</div>
+            <div class="token-swatch__value">#C0392B</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--color-info);"></div>
+            <div class="token-swatch__label">--color-info</div>
+            <div class="token-swatch__value">#1D6FA8</div>
+          </div>
+        </div>
+
+        <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: var(--space-3);">Couleurs de statuts</h3>
+        <div class="color-grid">
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--status-waiting-bg); border: 1px solid var(--status-waiting-border);"></div>
+            <div class="token-swatch__label">waiting-bg</div>
+            <div class="token-swatch__value">En attente</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--status-confirmed-bg); border: 1px solid var(--status-confirmed-border);"></div>
+            <div class="token-swatch__label">confirmed-bg</div>
+            <div class="token-swatch__value">Confirmée</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--status-preparing-bg); border: 1px solid var(--status-preparing-border);"></div>
+            <div class="token-swatch__label">preparing-bg</div>
+            <div class="token-swatch__value">En préparation</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--status-delivering-bg); border: 1px solid var(--status-delivering-border);"></div>
+            <div class="token-swatch__label">delivering-bg</div>
+            <div class="token-swatch__value">En livraison</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--status-delivered-bg); border: 1px solid var(--status-delivered-border);"></div>
+            <div class="token-swatch__label">delivered-bg</div>
+            <div class="token-swatch__value">Livrée</div>
+          </div>
+          <div class="token-swatch">
+            <div class="token-swatch__color" style="background-color: var(--status-cancelled-bg); border: 1px solid var(--status-cancelled-border);"></div>
+            <div class="token-swatch__label">cancelled-bg</div>
+            <div class="token-swatch__value">Annulée</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           SECTION 2 : TOKENS — TYPOGRAPHIE
+           ===================================================== -->
+      <section class="demo-section" id="tokens-typo" aria-labelledby="section-typo-title">
+        <h2 class="demo-section__title" id="section-typo-title">Typographie</h2>
+        <p class="demo-section__description">
+          Échelle de 6 tailles, de xs (12px) à 2xl (24px), avec graisses 400/500/600/700.
+        </p>
+
+        <div class="type-scale" role="list">
+          <div class="type-scale__item" role="listitem">
+            <span class="type-scale__label">2xl · 24px</span>
+            <span style="font-size: var(--font-size-2xl); font-weight: var(--font-weight-bold); color: var(--color-text-primary);">Commande prête à livrer</span>
+          </div>
+          <div class="type-scale__item" role="listitem">
+            <span class="type-scale__label">xl · 20px</span>
+            <span style="font-size: var(--font-size-xl); font-weight: var(--font-weight-semibold); color: var(--color-text-primary);">Tableau de bord commandes</span>
+          </div>
+          <div class="type-scale__item" role="listitem">
+            <span class="type-scale__label">lg · 18px</span>
+            <span style="font-size: var(--font-size-lg); font-weight: var(--font-weight-medium); color: var(--color-text-primary);">Fatou Diallo — Livraison 14h00</span>
+          </div>
+          <div class="type-scale__item" role="listitem">
+            <span class="type-scale__label">base · 16px</span>
+            <span style="font-size: var(--font-size-base); color: var(--color-text-primary);">Texte courant — 3 articles · 45 000 FCFA</span>
+          </div>
+          <div class="type-scale__item" role="listitem">
+            <span class="type-scale__label">sm · 14px</span>
+            <span style="font-size: var(--font-size-sm); color: var(--color-text-secondary);">Commentaire client · +221 77 123 45 67</span>
+          </div>
+          <div class="type-scale__item" role="listitem">
+            <span class="type-scale__label">xs · 12px</span>
+            <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Dernière mise à jour : 14/06/2026 à 09h32</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           SECTION 3 : TOKENS — ESPACEMENT
+           ===================================================== -->
+      <section class="demo-section" id="tokens-espacement" aria-labelledby="section-space-title">
+        <h2 class="demo-section__title" id="section-space-title">Espacement</h2>
+        <p class="demo-section__description">
+          Échelle en multiples de 4px. De <span class="code-tag">--space-1</span> (4px)
+          à <span class="code-tag">--space-16</span> (64px).
+        </p>
+
+        <div class="space-scale" role="list" aria-label="Échelle d'espacement">
+          <div class="space-scale__item" role="listitem">
+            <div class="space-scale__bar" style="width: 4px;" aria-hidden="true"></div>
+            <span class="space-scale__label">--space-1 · 4px</span>
+          </div>
+          <div class="space-scale__item" role="listitem">
+            <div class="space-scale__bar" style="width: 8px;" aria-hidden="true"></div>
+            <span class="space-scale__label">--space-2 · 8px</span>
+          </div>
+          <div class="space-scale__item" role="listitem">
+            <div class="space-scale__bar" style="width: 12px;" aria-hidden="true"></div>
+            <span class="space-scale__label">--space-3 · 12px</span>
+          </div>
+          <div class="space-scale__item" role="listitem">
+            <div class="space-scale__bar" style="width: 16px;" aria-hidden="true"></div>
+            <span class="space-scale__label">--space-4 · 16px</span>
+          </div>
+          <div class="space-scale__item" role="listitem">
+            <div class="space-scale__bar" style="width: 24px;" aria-hidden="true"></div>
+            <span class="space-scale__label">--space-6 · 24px</span>
+          </div>
+          <div class="space-scale__item" role="listitem">
+            <div class="space-scale__bar" style="width: 32px;" aria-hidden="true"></div>
+            <span class="space-scale__label">--space-8 · 32px</span>
+          </div>
+          <div class="space-scale__item" role="listitem">
+            <div class="space-scale__bar" style="width: 48px;" aria-hidden="true"></div>
+            <span class="space-scale__label">--space-12 · 48px</span>
+          </div>
+          <div class="space-scale__item" role="listitem">
+            <div class="space-scale__bar" style="width: 64px;" aria-hidden="true"></div>
+            <span class="space-scale__label">--space-16 · 64px</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           SECTION A : COMPOSANT — BADGES DE STATUT
+           ===================================================== -->
+      <section class="demo-section" id="composant-badges" aria-labelledby="section-badges-title">
+        <h2 class="demo-section__title" id="section-badges-title">A — Badges de statut</h2>
+        <p class="demo-section__description">
+          6 variantes de statuts de commande. Point indicateur animé pour "En livraison".
+          Contraste texte/fond garanti WCAG AA.
+        </p>
+
+        <div class="demo-row" role="list" aria-label="Variantes de badges">
+          <span class="badge badge--en-attente" role="listitem">En attente</span>
+          <span class="badge badge--confirmee" role="listitem">Confirmée</span>
+          <span class="badge badge--en-preparation" role="listitem">En préparation</span>
+          <span class="badge badge--en-livraison" role="listitem">En livraison</span>
+          <span class="badge badge--livree" role="listitem">Livrée</span>
+          <span class="badge badge--annulee" role="listitem">Annulée</span>
+        </div>
+
+        <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); margin-top: var(--space-6); margin-bottom: var(--space-3); text-transform: uppercase; letter-spacing: 0.05em;">Taille grande (--lg)</h3>
+        <div class="demo-row" role="list" aria-label="Badges grandes tailles">
+          <span class="badge badge--en-attente badge--lg" role="listitem">En attente</span>
+          <span class="badge badge--confirmee badge--lg" role="listitem">Confirmée</span>
+          <span class="badge badge--en-preparation badge--lg" role="listitem">En préparation</span>
+          <span class="badge badge--en-livraison badge--lg" role="listitem">En livraison</span>
+          <span class="badge badge--livree badge--lg" role="listitem">Livrée</span>
+          <span class="badge badge--annulee badge--lg" role="listitem">Annulée</span>
+        </div>
+
+        <div style="margin-top: var(--space-4);">
+          <span class="code-tag">class="badge badge--en-attente"</span>
+          &nbsp;
+          <span class="code-tag">badge--confirmee</span>
+          &nbsp;
+          <span class="code-tag">badge--en-preparation</span>
+          &nbsp;
+          <span class="code-tag">badge--en-livraison</span>
+          &nbsp;
+          <span class="code-tag">badge--livree</span>
+          &nbsp;
+          <span class="code-tag">badge--annulee</span>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           SECTION B : COMPOSANT — BOUTONS
+           ===================================================== -->
+      <section class="demo-section" id="composant-boutons" aria-labelledby="section-boutons-title">
+        <h2 class="demo-section__title" id="section-boutons-title">B — Boutons</h2>
+        <p class="demo-section__description">
+          Cible tactile minimum 44px. Tous les états : survol, actif, focus clavier, désactivé.
+        </p>
+
+        <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); margin-bottom: var(--space-3); text-transform: uppercase; letter-spacing: 0.05em;">Variantes</h3>
+        <div class="demo-row" style="margin-bottom: var(--space-6);">
+          <button class="btn btn--primary" type="button">Voir les détails</button>
+          <button class="btn btn--secondary" type="button">Contacter</button>
+          <button class="btn btn--ghost" type="button">Annuler</button>
+          <button class="btn btn--danger" type="button">Supprimer</button>
+        </div>
+
+        <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); margin-bottom: var(--space-3); text-transform: uppercase; letter-spacing: 0.05em;">Tailles</h3>
+        <div class="demo-row" style="margin-bottom: var(--space-6); align-items: center;">
+          <button class="btn btn--primary btn--sm" type="button">Petit</button>
+          <button class="btn btn--primary" type="button">Normal</button>
+          <button class="btn btn--primary btn--lg" type="button">Grand</button>
+        </div>
+
+        <h3 style="font-size: var(--font-size-sm); font-weight: var(--font-weight-semibold); color: var(--color-text-muted); margin-bottom: var(--space-3); text-transform: uppercase; letter-spacing: 0.05em;">Pleine largeur + désactivé</h3>
+        <div style="display: flex; flex-direction: column; gap: var(--space-3); max-width: 320px;">
+          <button class="btn btn--primary btn--full" type="button">Se connecter</button>
+          <button class="btn btn--secondary btn--full" type="button" disabled aria-disabled="true">Indisponible</button>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           SECTION C : COMPOSANT — CHAMPS DE FORMULAIRE
+           ===================================================== -->
+      <section class="demo-section" id="composant-formulaires" aria-labelledby="section-forms-title">
+        <h2 class="demo-section__title" id="section-forms-title">C — Champs de formulaire</h2>
+        <p class="demo-section__description">
+          États par défaut, focus (anneau bleu), erreur et désactivé.
+          Labels accessibles, messages d'erreur liés par aria-describedby.
+        </p>
+
+        <div style="max-width: 400px; display: flex; flex-direction: column; gap: var(--space-4);">
+          <!-- Champ normal -->
+          <div class="form-group">
+            <label class="form-label form-label--required" for="demo-email">Adresse e-mail</label>
+            <input
+              class="form-input"
+              type="email"
+              id="demo-email"
+              name="email"
+              placeholder="gerant@traiteur.sn"
+              autocomplete="email"
+            >
+          </div>
+
+          <!-- Champ avec erreur -->
+          <div class="form-group">
+            <label class="form-label form-label--required" for="demo-phone">Téléphone</label>
+            <input
+              class="form-input form-input--error"
+              type="tel"
+              id="demo-phone"
+              name="phone"
+              placeholder="+221 77 000 00 00"
+              value="abc"
+              aria-invalid="true"
+              aria-describedby="demo-phone-error"
+            >
+            <span class="form-error-message" id="demo-phone-error" role="alert">
+              <!-- Icône avertissement -->
+              <svg class="login-form__error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              Numéro de téléphone invalide
+            </span>
+          </div>
+
+          <!-- Champ mot de passe avec toggle -->
+          <div class="form-group">
+            <label class="form-label form-label--required" for="demo-pass">Mot de passe</label>
+            <div class="form-input-wrapper">
+              <input
+                class="form-input"
+                type="password"
+                id="demo-pass"
+                name="password"
+                placeholder="••••••••"
+                autocomplete="current-password"
+              >
+              <button
+                type="button"
+                class="form-input-wrapper__addon"
+                aria-label="Afficher le mot de passe"
+                id="toggle-pass"
+                aria-pressed="false"
+              >
+                <!-- Icône oeil -->
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sélect -->
+          <div class="form-group">
+            <label class="form-label" for="demo-statut">Statut de commande</label>
+            <select class="form-select" id="demo-statut" name="statut">
+              <option value="">Tous les statuts</option>
+              <option value="en-attente">En attente</option>
+              <option value="confirmee">Confirmée</option>
+              <option value="en-preparation">En préparation</option>
+              <option value="en-livraison">En livraison</option>
+              <option value="livree">Livrée</option>
+              <option value="annulee">Annulée</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           SECTION D : COMPOSANT — CARTES DE COMMANDE
+           ===================================================== -->
+      <section class="demo-section" id="composant-cartes" aria-labelledby="section-cards-title">
+        <h2 class="demo-section__title" id="section-cards-title">D — Cartes de commande</h2>
+        <p class="demo-section__description">
+          Largeur 100% mobile, max 420px. Hover avec élévation.
+          Lien WhatsApp cliquable avec aria-label descriptif.
+        </p>
+
+        <div class="demo-grid">
+
+          <!-- Carte 1 : En attente -->
+          <article class="order-card" aria-labelledby="cmd-001-title">
+            <div class="order-card__header">
+              <div class="order-card__header-left">
+                <span class="order-card__number" id="cmd-001-title">#CMD-001</span>
+                <span class="badge badge--en-attente">En attente</span>
+              </div>
+              <button
+                class="btn btn--icon"
+                type="button"
+                aria-label="Plus d'options pour la commande CMD-001"
+                aria-haspopup="menu"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="order-card__body">
+              <p class="order-card__client-name">Fatou Diallo</p>
+
+              <div class="order-card__info-row">
+                <a
+                  href="https://wa.me/221771234567"
+                  class="order-card__whatsapp-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Contacter Fatou Diallo sur WhatsApp au +221 77 123 45 67"
+                >
+                  <!-- Icône WhatsApp SVG -->
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                  +221 77 123 45 67
+                </a>
+              </div>
+
+              <div class="order-card__info-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <time datetime="2026-06-15T14:00">Livraison sam. 15 juin à 14h00</time>
+              </div>
+
+              <div class="order-card__summary">
+                <span class="order-card__summary-items">3 articles</span>
+                <span class="order-card__summary-amount">45 000 FCFA</span>
+              </div>
+            </div>
+
+            <div class="order-card__footer">
+              <button class="btn btn--primary btn--sm" type="button">Voir les détails</button>
+              <button class="btn btn--secondary btn--sm" type="button">Contacter</button>
+            </div>
+          </article>
+
+          <!-- Carte 2 : En livraison -->
+          <article class="order-card" aria-labelledby="cmd-002-title">
+            <div class="order-card__header">
+              <div class="order-card__header-left">
+                <span class="order-card__number" id="cmd-002-title">#CMD-002</span>
+                <span class="badge badge--en-livraison">En livraison</span>
+              </div>
+              <button class="btn btn--icon" type="button" aria-label="Plus d'options pour la commande CMD-002" aria-haspopup="menu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="order-card__body">
+              <p class="order-card__client-name">Moussa Ndiaye</p>
+
+              <div class="order-card__info-row">
+                <a
+                  href="https://wa.me/221781234567"
+                  class="order-card__whatsapp-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Contacter Moussa Ndiaye sur WhatsApp au +221 78 123 45 67"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                  +221 78 123 45 67
+                </a>
+              </div>
+
+              <div class="order-card__info-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <time datetime="2026-06-14T12:30">Livraison dim. 14 juin à 12h30</time>
+              </div>
+
+              <div class="order-card__summary">
+                <span class="order-card__summary-items">7 articles</span>
+                <span class="order-card__summary-amount">120 000 FCFA</span>
+              </div>
+            </div>
+
+            <div class="order-card__footer">
+              <button class="btn btn--primary btn--sm" type="button">Voir les détails</button>
+              <button class="btn btn--secondary btn--sm" type="button">Contacter</button>
+            </div>
+          </article>
+
+          <!-- Carte 3 : Livrée -->
+          <article class="order-card" aria-labelledby="cmd-003-title">
+            <div class="order-card__header">
+              <div class="order-card__header-left">
+                <span class="order-card__number" id="cmd-003-title">#CMD-003</span>
+                <span class="badge badge--livree">Livrée</span>
+              </div>
+              <button class="btn btn--icon" type="button" aria-label="Plus d'options pour la commande CMD-003" aria-haspopup="menu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="order-card__body">
+              <p class="order-card__client-name">Aminata Sow</p>
+
+              <div class="order-card__info-row">
+                <a
+                  href="https://wa.me/221701234567"
+                  class="order-card__whatsapp-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Contacter Aminata Sow sur WhatsApp au +221 70 123 45 67"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                  </svg>
+                  +221 70 123 45 67
+                </a>
+              </div>
+
+              <div class="order-card__info-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+                <time datetime="2026-06-13T10:00">Livrée ven. 13 juin à 10h00</time>
+              </div>
+
+              <div class="order-card__summary">
+                <span class="order-card__summary-items">5 articles</span>
+                <span class="order-card__summary-amount">78 500 FCFA</span>
+              </div>
+            </div>
+
+            <div class="order-card__footer">
+              <button class="btn btn--primary btn--sm" type="button">Voir les détails</button>
+              <button class="btn btn--ghost btn--sm" type="button" disabled aria-disabled="true">Annulée</button>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- =====================================================
+           SECTION E : COMPOSANT — FORMULAIRE DE CONNEXION
+           ===================================================== -->
+      <section class="demo-section" id="composant-connexion" aria-labelledby="section-login-title">
+        <h2 class="demo-section__title" id="section-login-title">E — Formulaire de connexion</h2>
+        <p class="demo-section__description">
+          Centré, max 400px. Logo ou initiales en fallback.
+          Animation d'entrée pour le message d'erreur.
+        </p>
+
+        <div class="demo-login-wrapper">
+          <form
+            class="login-form"
+            action="#"
+            method="post"
+            novalidate
+            aria-labelledby="login-title"
+            style="box-shadow: none; border: 2px dashed var(--color-border);"
+          >
+            <!-- Marque / logo -->
+            <div class="login-form__brand">
+              <div class="login-form__logo-fallback" aria-hidden="true">TP</div>
+              <span class="login-form__brand-name">TraiteurPro</span>
+              <span class="login-form__tagline">Gestion de commandes au Sénégal</span>
+            </div>
+
+            <!-- Message d'erreur (visible par défaut pour la démo) -->
+            <div
+              class="login-form__error"
+              id="login-error"
+              role="alert"
+              aria-live="polite"
+            >
+              <svg class="login-form__error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+              Adresse e-mail ou mot de passe incorrect.
+            </div>
+
+            <!-- Champs -->
+            <div class="login-form__fields">
+              <div class="form-group">
+                <label class="form-label form-label--required" for="login-email">Adresse e-mail</label>
+                <input
+                  class="form-input form-input--error"
+                  type="email"
+                  id="login-email"
+                  name="email"
+                  placeholder="gerant@montraiteur.sn"
+                  autocomplete="email"
+                  aria-invalid="true"
+                  aria-describedby="login-error"
+                >
+              </div>
+
+              <div class="form-group">
+                <label class="form-label form-label--required" for="login-password">Mot de passe</label>
+                <div class="form-input-wrapper">
+                  <input
+                    class="form-input"
+                    type="password"
+                    id="login-password"
+                    name="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                  >
+                  <button
+                    type="button"
+                    class="form-input-wrapper__addon"
+                    aria-label="Afficher le mot de passe"
+                    id="login-toggle-pass"
+                    aria-pressed="false"
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="login-form__forgot">
+                  <a href="#" aria-label="Réinitialiser votre mot de passe">Mot de passe oublié ?</a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bouton connexion -->
+            <button class="btn btn--primary btn--full btn--lg" type="submit">
+              Se connecter
+            </button>
+
+            <!-- Pied de formulaire -->
+            <p class="login-form__footer">
+              Probleme d'acces ? Contactez votre administrateur.
+            </p>
+          </form>
+        </div>
+      </section>
+
+      <!-- =====================================================
+           SECTION F : COMPOSANT — TABLEAU DE COMMANDES
+           ===================================================== -->
+      <section class="demo-section" id="composant-tableau" aria-labelledby="section-table-title">
+        <h2 class="demo-section__title" id="section-table-title">F — Tableau de commandes</h2>
+        <p class="demo-section__description">
+          Mobile : liste de cartes empilees. Desktop (>=768px) : table avec tri, lignes alternees,
+          hover highlight, header fixe. Pagination simple.
+          Barre de recherche + filtre statut.
+        </p>
+
+        <!-- Barre d'outils -->
+        <div class="orders-toolbar">
+          <div class="orders-toolbar__left">
+            <div class="search-input-wrapper" style="max-width: 320px;">
+              <svg class="search-input-wrapper__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+              </svg>
+              <input
+                class="search-input"
+                type="search"
+                placeholder="Rechercher un client, une commande..."
+                aria-label="Rechercher dans les commandes"
+              >
+            </div>
+          </div>
+          <div class="orders-toolbar__right">
+            <select class="status-filter" aria-label="Filtrer par statut">
+              <option value="">Tous les statuts</option>
+              <option value="en-attente">En attente</option>
+              <option value="confirmee">Confirmee</option>
+              <option value="en-preparation">En preparation</option>
+              <option value="en-livraison">En livraison</option>
+              <option value="livree">Livree</option>
+              <option value="annulee">Annulee</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- VERSION MOBILE : liste de cartes (visible < 768px) -->
+        <div class="orders-list" aria-label="Liste des commandes" role="list">
+
+          <article class="order-card" role="listitem" aria-labelledby="m-cmd-001">
+            <div class="order-card__header">
+              <div class="order-card__header-left">
+                <span class="order-card__number" id="m-cmd-001">#CMD-001</span>
+                <span class="badge badge--en-attente">En attente</span>
+              </div>
+              <button class="btn btn--icon" type="button" aria-label="Options CMD-001">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                </svg>
+              </button>
+            </div>
+            <div class="order-card__body">
+              <p class="order-card__client-name">Fatou Diallo</p>
+              <div class="order-card__info-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <time datetime="2026-06-15T14:00">Livraison sam. 15 juin a 14h00</time>
+              </div>
+              <div class="order-card__summary">
+                <span class="order-card__summary-items">3 articles</span>
+                <span class="order-card__summary-amount">45 000 FCFA</span>
+              </div>
+            </div>
+            <div class="order-card__footer">
+              <button class="btn btn--primary btn--sm">Voir les details</button>
+              <button class="btn btn--secondary btn--sm">Contacter</button>
+            </div>
+          </article>
+
+          <article class="order-card" role="listitem" aria-labelledby="m-cmd-002">
+            <div class="order-card__header">
+              <div class="order-card__header-left">
+                <span class="order-card__number" id="m-cmd-002">#CMD-002</span>
+                <span class="badge badge--en-livraison">En livraison</span>
+              </div>
+              <button class="btn btn--icon" type="button" aria-label="Options CMD-002">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <circle cx="12" cy="5" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="19" r="1.5"/>
+                </svg>
+              </button>
+            </div>
+            <div class="order-card__body">
+              <p class="order-card__client-name">Moussa Ndiaye</p>
+              <div class="order-card__info-row">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <time datetime="2026-06-14T12:30">Livraison dim. 14 juin a 12h30</time>
+              </div>
+              <div class="order-card__summary">
+                <span class="order-card__summary-items">7 articles</span>
+                <span class="order-card__summary-amount">120 000 FCFA</span>
+              </div>
+            </div>
+            <div class="order-card__footer">
+              <button class="btn btn--primary btn--sm">Voir les details</button>
+              <button class="btn btn--secondary btn--sm">Contacter</button>
+            </div>
+          </article>
+
+        </div>
+
+        <!-- VERSION DESKTOP : vraie table (visible >= 768px) -->
+        <div class="orders-table-wrapper">
+          <div class="orders-table-scroll">
+            <table class="orders-table" aria-label="Tableau des commandes">
+              <thead>
+                <tr>
+                  <th scope="col">
+                    <button class="th-sort" aria-sort="ascending">
+                      # <svg class="th-sort__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M12 5v14M5 12l7-7 7 7"/></svg>
+                    </button>
+                  </th>
+                  <th scope="col">
+                    <button class="th-sort" aria-sort="none">
+                      Client <svg class="th-sort__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 8l5-5 5 5M7 16l5 5 5-5"/></svg>
+                    </button>
+                  </th>
+                  <th scope="col">Articles</th>
+                  <th scope="col">
+                    <button class="th-sort" aria-sort="none">
+                      Montant <svg class="th-sort__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 8l5-5 5 5M7 16l5 5 5-5"/></svg>
+                    </button>
+                  </th>
+                  <th scope="col">Statut</th>
+                  <th scope="col">
+                    <button class="th-sort" aria-sort="none">
+                      Date livraison <svg class="th-sort__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 8l5-5 5 5M7 16l5 5 5-5"/></svg>
+                    </button>
+                  </th>
+                  <th scope="col" style="text-align: right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="col-number">#CMD-001</td>
+                  <td class="col-client">Fatou Diallo</td>
+                  <td>3 articles</td>
+                  <td class="col-amount">45 000 FCFA</td>
+                  <td><span class="badge badge--en-attente">En attente</span></td>
+                  <td class="col-date"><time datetime="2026-06-15T14:00">15/06 14h00</time></td>
+                  <td class="col-actions">
+                    <button class="btn btn--ghost btn--sm" type="button">Détails</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="col-number">#CMD-002</td>
+                  <td class="col-client">Moussa Ndiaye</td>
+                  <td>7 articles</td>
+                  <td class="col-amount">120 000 FCFA</td>
+                  <td><span class="badge badge--en-livraison">En livraison</span></td>
+                  <td class="col-date"><time datetime="2026-06-14T12:30">14/06 12h30</time></td>
+                  <td class="col-actions">
+                    <button class="btn btn--ghost btn--sm" type="button">Détails</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="col-number">#CMD-003</td>
+                  <td class="col-client">Aminata Sow</td>
+                  <td>5 articles</td>
+                  <td class="col-amount">78 500 FCFA</td>
+                  <td><span class="badge badge--livree">Livrée</span></td>
+                  <td class="col-date"><time datetime="2026-06-13T10:00">13/06 10h00</time></td>
+                  <td class="col-actions">
+                    <button class="btn btn--ghost btn--sm" type="button">Détails</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="col-number">#CMD-004</td>
+                  <td class="col-client">Ibrahima Ba</td>
+                  <td>2 articles</td>
+                  <td class="col-amount">22 000 FCFA</td>
+                  <td><span class="badge badge--en-preparation">En préparation</span></td>
+                  <td class="col-date"><time datetime="2026-06-16T18:00">16/06 18h00</time></td>
+                  <td class="col-actions">
+                    <button class="btn btn--ghost btn--sm" type="button">Détails</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="col-number">#CMD-005</td>
+                  <td class="col-client">Mariama Diop</td>
+                  <td>10 articles</td>
+                  <td class="col-amount">245 000 FCFA</td>
+                  <td><span class="badge badge--confirmee">Confirmée</span></td>
+                  <td class="col-date"><time datetime="2026-06-20T09:00">20/06 09h00</time></td>
+                  <td class="col-actions">
+                    <button class="btn btn--ghost btn--sm" type="button">Détails</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="col-number">#CMD-006</td>
+                  <td class="col-client">Ousmane Fall</td>
+                  <td>1 article</td>
+                  <td class="col-amount">15 000 FCFA</td>
+                  <td><span class="badge badge--annulee">Annulée</span></td>
+                  <td class="col-date"><time datetime="2026-06-12T11:00">12/06 11h00</time></td>
+                  <td class="col-actions">
+                    <button class="btn btn--ghost btn--sm" type="button">Détails</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <nav class="pagination" aria-label="Pagination des commandes">
+            <span class="pagination__info">Commandes 1-6 sur 24</span>
+            <div class="pagination__pages">
+              <button class="page-btn page-btn--nav" type="button" disabled aria-label="Page précédente">
+                Précédent
+              </button>
+              <button class="page-btn" type="button" aria-current="page" aria-label="Page 1, actuelle">1</button>
+              <button class="page-btn" type="button" aria-label="Page 2">2</button>
+              <button class="page-btn" type="button" aria-label="Page 3">3</button>
+              <span aria-hidden="true" style="padding: 0 var(--space-1); color: var(--color-text-muted);">...</span>
+              <button class="page-btn" type="button" aria-label="Page 4">4</button>
+              <button class="page-btn page-btn--nav" type="button" aria-label="Page suivante">
+                Suivant
+              </button>
+            </div>
+          </nav>
+        </div>
+
+      </section>
+
+    </div><!-- /container -->
+  </main>
+
+  <!-- Pied de page de démo -->
+  <footer style="border-top: 1px solid var(--color-border); padding: var(--space-8) var(--space-4); text-align: center; color: var(--color-text-muted); font-size: var(--font-size-xs); line-height: var(--line-height-relaxed);" role="contentinfo">
+    <p>Système de design TraiteurPro — CSS pur, mobile-first, WCAG AA</p>
+    <p style="margin-top: var(--space-1);">Personnalisable par client via variables CSS — <span class="code-tag">tokens.css</span> + <span class="code-tag">theme-example.css</span></p>
+  </footer>
+
+  <!-- =====================================================
+       JAVASCRIPT (interactions légères, aucun framework)
+       ===================================================== -->
+  <script>
+    /* --------------------------------------------------
+     * 1. Bascule thème clair / sombre
+     * -------------------------------------------------- */
+    (function () {
+      var html = document.documentElement;
+      var btn = document.getElementById('theme-toggle');
+      var label = document.getElementById('theme-label');
+      var icon = document.getElementById('theme-icon');
+
+      // Icônes inline SVG
+      var iconSun = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+      var iconMoon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+
+      // Lire la préférence sauvegardée
+      var saved = localStorage.getItem('theme');
+      if (saved === 'dark') {
+        html.dataset.theme = 'dark';
+        btn.setAttribute('aria-pressed', 'true');
+        label.textContent = 'Mode clair';
+        icon.innerHTML = iconSun;
+      }
+
+      btn.addEventListener('click', function () {
+        var isDark = html.dataset.theme === 'dark';
+        if (isDark) {
+          html.dataset.theme = 'light';
+          btn.setAttribute('aria-pressed', 'false');
+          label.textContent = 'Mode sombre';
+          icon.innerHTML = iconMoon;
+          localStorage.setItem('theme', 'light');
+        } else {
+          html.dataset.theme = 'dark';
+          btn.setAttribute('aria-pressed', 'true');
+          label.textContent = 'Mode clair';
+          icon.innerHTML = iconSun;
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+    }());
+
+    /* --------------------------------------------------
+     * 2. Sélecteur de thème client (démo Aminata)
+     * -------------------------------------------------- */
+    (function () {
+      var select = document.getElementById('client-theme');
+      if (!select) return;
+
+      // Charger le CSS du thème client dynamiquement
+      var themeLink = null;
+
+      select.addEventListener('change', function () {
+        var val = this.value;
+
+        // Retirer le lien précédent
+        if (themeLink && themeLink.parentNode) {
+          themeLink.parentNode.removeChild(themeLink);
+          themeLink = null;
+        }
+
+        // Retirer les attributs data-client existants
+        document.documentElement.removeAttribute('data-client');
+
+        if (val === 'aminata') {
+          // Charger theme-example.css
+          themeLink = document.createElement('link');
+          themeLink.rel = 'stylesheet';
+          themeLink.href = 'theme-example.css';
+          document.head.appendChild(themeLink);
+
+          // Appliquer l'attribut data-client
+          document.documentElement.dataset.client = 'aminata';
+        }
+      });
+    }());
+
+    /* --------------------------------------------------
+     * 3. Toggle visibilité mot de passe
+     * -------------------------------------------------- */
+    (function () {
+      var toggles = [
+        { btnId: 'toggle-pass', inputId: 'demo-pass' },
+        { btnId: 'login-toggle-pass', inputId: 'login-password' }
+      ];
+
+      toggles.forEach(function (pair) {
+        var btn = document.getElementById(pair.btnId);
+        var input = document.getElementById(pair.inputId);
+        if (!btn || !input) return;
+
+        btn.addEventListener('click', function () {
+          var isVisible = input.type === 'text';
+          input.type = isVisible ? 'password' : 'text';
+          btn.setAttribute('aria-pressed', isVisible ? 'false' : 'true');
+          btn.setAttribute(
+            'aria-label',
+            isVisible ? 'Afficher le mot de passe' : 'Masquer le mot de passe'
+          );
+        });
+      });
+    }());
+
+    /* --------------------------------------------------
+     * 4. Navigation interne fluide (navigation de démo)
+     * -------------------------------------------------- */
+    (function () {
+      var navLinks = document.querySelectorAll('.demo-nav__item a[href^="#"]');
+      navLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+          var target = document.querySelector(this.getAttribute('href'));
+          if (target) {
+            e.preventDefault();
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // Déplacer le focus pour les lecteurs d'écran
+            target.setAttribute('tabindex', '-1');
+            target.focus({ preventScroll: true });
+          }
+        });
+      });
+    }());
+  </script>
+
+</body>
+</html>
