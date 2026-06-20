@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { getAdminSupabase } from '@/lib/auth';
 import Link from 'next/link';
 import { Settings, Users, ExternalLink, Store, Plus, ShieldCheck } from 'lucide-react';

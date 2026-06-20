@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import { getAdminSupabase } from '@/lib/auth';
 import { TenantDetail } from './TenantDetail';
