@@ -15,4 +15,3 @@ providers = ["node"]
 
 [nixpacks.environment]
 NODE_VERSION = "20"
-PORT = "3000"
