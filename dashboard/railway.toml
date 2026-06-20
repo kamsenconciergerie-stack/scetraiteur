@@ -4,8 +4,8 @@ buildCommand = "npm install --no-audit --no-fund --cache /tmp/npm-cache && npm r
 
 [deploy]
 startCommand = "node .next/standalone/server.js"
-healthcheckPath = "/"
-healthcheckTimeout = 30
+healthcheckPath = "/login"
+healthcheckTimeout = 60
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
