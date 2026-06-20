@@ -1,7 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { createClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
-import type { Database } from './types';
 
 export interface JwtClaims {
   sub:          string;
@@ -14,16 +13,16 @@ export interface JwtClaims {
 /** Client Supabase pour les Server Components (lit les cookies de session). */
 export function getServerSupabase() {
   const cookieStore = cookies();
-  return createServerClient<Database>(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
-        getAll()          { return cookieStore.getAll(); },
-        setAll(toSet)     {
+        getAll() { return cookieStore.getAll(); },
+        setAll(toSet: Array<{ name: string; value: string; options?: Record<string, unknown> }>) {
           try {
             toSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, options as Parameters<typeof cookieStore.set>[2])
             );
           } catch {}
         },
@@ -34,7 +33,7 @@ export function getServerSupabase() {
 
 /** Client Supabase avec service_role — uniquement côté serveur (Server Actions / API routes). */
 export function getAdminSupabase() {
-  return createClient<Database>(
+  return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } }

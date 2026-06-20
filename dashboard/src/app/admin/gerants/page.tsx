@@ -285,7 +285,7 @@ export default function GerantsPage() {
                   disabled={isPending || !newAdmin.email || !newAdmin.password}
                   className="rounded-lg bg-gray-800 px-4 py-2 text-sm text-white hover:bg-gray-900 disabled:opacity-50 transition-colors"
                 >
-                  {isPending ? 'Création…' : 'Créer l'admin'}
+                  {isPending ? 'Création…' : "Créer l'admin"}
                 </button>
                 <button
                   onClick={() => setShowAdmin(false)}

@@ -49,7 +49,7 @@ export default function LoginPage() {
     } else if (claims.tenant_slug) {
       router.push(`/${claims.tenant_slug}/orders`);
     } else {
-      setError('Compte non configuré. Contactez l'administrateur.');
+      setError("Compte non configuré. Contactez l'administrateur.");
       setLoading(false);
     }
   }
