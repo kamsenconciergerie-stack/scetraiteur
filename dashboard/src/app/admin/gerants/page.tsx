@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
+import { supabase } from '@/lib/supabase';
 import { createGerantAction, createAdminSaasAction, deleteGerantAction } from '../actions';
 import { Users, Plus, Trash2, ShieldCheck, User } from 'lucide-react';
 import Link from 'next/link';
@@ -30,11 +30,6 @@ export default function GerantsPage() {
   const [newAdmin,      setNewAdmin]      = useState(EMPTY_ADMIN);
   const [formError,     setFormError]     = useState<string | null>(null);
   const [isPending,     startTransition]  = useTransition();
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
 
   async function load() {
     setLoading(true);
