@@ -1,6 +1,6 @@
 [build]
 builder = "nixpacks"
-buildCommand = "npm install --no-audit --no-fund && npm run build"
+buildCommand = "npm install --no-audit --no-fund --cache /tmp/npm-cache && npm run build"
 
 [deploy]
 startCommand = "node .next/standalone/server.js"
