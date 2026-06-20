@@ -1,0 +1,17 @@
+[build]
+builder = "nixpacks"
+buildCommand = "npm ci && npm run build"
+
+[deploy]
+startCommand = "node .next/standalone/server.js"
+healthcheckPath = "/"
+healthcheckTimeout = 30
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[nixpacks]
+# Pin Node.js 20 LTS to match @types/node ^20 in package.json
+providers = ["node"]
+
+[nixpacks.environment]
+NODE_VERSION = "20"
