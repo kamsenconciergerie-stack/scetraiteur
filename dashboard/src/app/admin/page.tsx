@@ -26,13 +26,22 @@ export default async function AdminPage() {
             <Settings className="h-6 w-6 text-indigo-600" />
             <h1 className="text-xl font-bold text-gray-900">OrderFlow — Admin SaaS</h1>
           </div>
-          <Link
-            href="/admin/tenants/new"
-            className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 transition-colors"
-          >
-            <Users className="h-4 w-4" />
-            Nouveau client
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/admin/gerants"
+              className="flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              <Users className="h-4 w-4" />
+              Gérants
+            </Link>
+            <Link
+              href="/admin/tenants/new"
+              className="flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm text-white hover:bg-indigo-700 transition-colors"
+            >
+              <Users className="h-4 w-4" />
+              Nouveau client
+            </Link>
+          </div>
         </div>
       </header>
 

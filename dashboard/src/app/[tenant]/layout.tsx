@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ShoppingBag, Package, Truck, LayoutDashboard } from 'lucide-react';
+import { getSessionAndClaims } from '@/lib/auth';
+import { UserMenu } from '@/components/UserMenu';
 
 async function getTenant(slug: string) {
   const supabase = createClient(
@@ -24,7 +26,10 @@ export default async function TenantLayout({
   children: React.ReactNode;
   params:   { tenant: string };
 }) {
-  const tenant = await getTenant(params.tenant);
+  const [tenant, { claims }] = await Promise.all([
+    getTenant(params.tenant),
+    getSessionAndClaims(),
+  ]);
   if (!tenant) notFound();
 
   const navItems = [
@@ -55,13 +60,18 @@ export default async function TenantLayout({
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/admin"
-              className="ml-4 flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
-            >
-              <LayoutDashboard className="h-3 w-3" />
-              Admin
-            </Link>
+            {claims?.user_role === 'admin_saas' && (
+              <Link
+                href="/admin"
+                className="ml-4 flex items-center gap-1 text-xs text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <LayoutDashboard className="h-3 w-3" />
+                Admin
+              </Link>
+            )}
+            <div className="ml-4">
+              <UserMenu email={claims?.email ?? ''} />
+            </div>
           </nav>
         </div>
       </header>
