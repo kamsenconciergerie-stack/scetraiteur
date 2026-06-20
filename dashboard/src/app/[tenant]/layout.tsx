@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ShoppingBag, Package, LayoutDashboard } from 'lucide-react';
+import { ShoppingBag, Package, Truck, LayoutDashboard } from 'lucide-react';
 
 async function getTenant(slug: string) {
   const supabase = createClient(
@@ -28,8 +28,9 @@ export default async function TenantLayout({
   if (!tenant) notFound();
 
   const navItems = [
-    { href: `/${params.tenant}/orders`, label: 'Commandes', icon: ShoppingBag },
-    { href: `/${params.tenant}/stock`,  label: 'Stock',     icon: Package },
+    { href: `/${params.tenant}/orders`,   label: 'Commandes', icon: ShoppingBag },
+    { href: `/${params.tenant}/stock`,    label: 'Stock',     icon: Package },
+    { href: `/${params.tenant}/livreurs`, label: 'Livreurs',  icon: Truck },
   ];
 
   return (

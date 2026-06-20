@@ -90,15 +90,55 @@ export const STATUS_COLORS: Record<OrderStatus, string> = {
   cancelled:        'bg-red-50 text-red-500',
 };
 
+export type LivreurDisponibilite = 'disponible' | 'occupe' | 'hors_plage' | 'conge' | 'inactif';
+
+export interface LivreurAvecDispo extends Livreur {
+  disponibilite: LivreurDisponibilite;
+}
+
+export interface LivreurAgenda {
+  id:            string;
+  livreur_id:    string;
+  jour_semaine:  number; // 0=Dim 1=Lun 2=Mar 3=Mer 4=Jeu 5=Ven 6=Sam
+  heure_debut:   string; // "HH:MM:SS"
+  heure_fin:     string;
+  actif:         boolean;
+  created_at:    string;
+}
+
+export interface LivreurConge {
+  id:          string;
+  livreur_id:  string;
+  date_debut:  string;
+  date_fin:    string;
+  raison:      string | null;
+  created_at:  string;
+}
+
+export const JOURS: { value: number; label: string }[] = [
+  { value: 1, label: 'Lundi' },
+  { value: 2, label: 'Mardi' },
+  { value: 3, label: 'Mercredi' },
+  { value: 4, label: 'Jeudi' },
+  { value: 5, label: 'Vendredi' },
+  { value: 6, label: 'Samedi' },
+  { value: 0, label: 'Dimanche' },
+];
+
 // Supabase generated types placeholder
 export type Database = {
   public: {
     Tables: {
-      tenants:    { Row: Tenant };
-      products:   { Row: Product };
-      livreurs:   { Row: Livreur };
-      orders:     { Row: Order };
-      order_items:{ Row: OrderItem };
+      tenants:         { Row: Tenant };
+      products:        { Row: Product };
+      livreurs:        { Row: Livreur };
+      orders:          { Row: Order };
+      order_items:     { Row: OrderItem };
+      livreur_agenda:  { Row: LivreurAgenda };
+      livreur_conges:  { Row: LivreurConge };
+    };
+    Views: {
+      v_livreurs_disponibilite: { Row: LivreurAvecDispo };
     };
   };
 };
