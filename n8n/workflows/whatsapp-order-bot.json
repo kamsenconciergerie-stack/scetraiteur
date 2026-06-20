@@ -10,9 +10,7 @@
       "parameters": {
         "path": "whatsapp",
         "responseMode": "responseNode",
-        "options": {
-          "rawBody": true
-        }
+        "options": { "rawBody": true }
       }
     },
     {
@@ -41,7 +39,7 @@
       "typeVersion": 2,
       "position": [720, 480],
       "parameters": {
-        "jsCode": "// Meta envoie un GET pour vérifier le webhook\nconst query = $input.first().json.query || {};\nconst mode      = query['hub.mode'];\nconst token     = query['hub.verify_token'];\nconst challenge = query['hub.challenge'];\n\n// Le verify_token doit correspondre à celui du tenant\n// Pour le MVP, on utilise une valeur fixe dans les variables n8n\nconst VERIFY_TOKEN = $env.ORDERFLOW_VERIFY_TOKEN || 'mon-verify-token-secret';\n\nif (mode === 'subscribe' && token === VERIFY_TOKEN) {\n  return [{ json: { challenge, status: 200 } }];\n}\nreturn [{ json: { error: 'Forbidden', status: 403 } }];"
+        "jsCode": "const query = $input.first().json.query || {};\nconst mode      = query['hub.mode'];\nconst token     = query['hub.verify_token'];\nconst challenge = query['hub.challenge'];\nconst VERIFY_TOKEN = $env.ORDERFLOW_VERIFY_TOKEN || 'mon-verify-token-secret';\nif (mode === 'subscribe' && token === VERIFY_TOKEN) {\n  return [{ json: { challenge, status: 200 } }];\n}\nreturn [{ json: { error: 'Forbidden', status: 403 } }];"
       }
     },
     {
@@ -53,9 +51,7 @@
       "parameters": {
         "respondWith": "text",
         "responseBody": "={{ $json.challenge }}",
-        "options": {
-          "responseCode": "={{ $json.status }}"
-        }
+        "options": { "responseCode": "={{ $json.status }}" }
       }
     },
     {
@@ -77,7 +73,7 @@
       "typeVersion": 2,
       "position": [980, 300],
       "parameters": {
-        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\n// Structure Meta WhatsApp Cloud API\nconst entry   = body?.entry?.[0];\nconst changes = entry?.changes?.[0]?.value;\n\nif (!changes?.messages?.length) {\n  // Pas un message (ex: statut de livraison Meta)\n  return [];\n}\n\nconst message       = changes.messages[0];\nconst phoneNumberId = changes.metadata?.phone_number_id;\nconst senderPhone   = message.from;  // numéro du client\nconst messageType   = message.type;  // 'text', 'interactive', etc.\n\nlet messageText = '';\nif (messageType === 'text') {\n  messageText = message.text?.body?.trim() || '';\n} else if (messageType === 'interactive') {\n  messageText = message.interactive?.button_reply?.id ||\n                message.interactive?.list_reply?.id || '';\n}\n\nreturn [{\n  json: {\n    phoneNumberId,\n    senderPhone,\n    messageText,\n    messageType,\n    rawMessage: message\n  }\n}];"
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\nconst entry   = body?.entry?.[0];\nconst changes = entry?.changes?.[0]?.value;\nif (!changes?.messages?.length) return [];\nconst message       = changes.messages[0];\nconst phoneNumberId = changes.metadata?.phone_number_id;\nconst senderPhone   = message.from;\nconst messageType   = message.type;\nlet messageText = '';\nif (messageType === 'text') {\n  messageText = message.text?.body?.trim() || '';\n} else if (messageType === 'interactive') {\n  messageText = message.interactive?.button_reply?.id || message.interactive?.list_reply?.id || '';\n}\nreturn [{ json: { phoneNumberId, senderPhone, messageText, messageType, rawMessage: message } }];"
       }
     },
     {
@@ -97,8 +93,7 @@
             { "name": "apikey",        "value": "={{ $env.SUPABASE_SERVICE_KEY }}" },
             { "name": "Authorization", "value": "=Bearer {{ $env.SUPABASE_SERVICE_KEY }}" }
           ]
-        },
-        "options": {}
+        }
       }
     },
     {
@@ -174,7 +169,7 @@
       "typeVersion": 2,
       "position": [2280, 200],
       "parameters": {
-        "jsCode": "// ================================================================\n//  OrderFlow Bot Engine — Machine à états WhatsApp\n// ================================================================\n\nconst tenant   = $('Charger config tenant').item.json[0];\nconst products = $('Charger produits').all().map(i => i.json);\nconst sessions = $('Charger session').all();\nconst msg      = $('Extraire le message').item.json;\n\nconst sessionData = sessions.length ? sessions[0].json : null;\nconst state   = sessionData?.state   || 'INITIAL';\nconst context = sessionData?.context || {};\n\nconst phone = msg.senderPhone;\nconst text  = msg.messageText.trim();\n\n// ── Helpers ──────────────────────────────────────────────────\nfunction formatCart(cart) {\n  return cart.map(item => `  • ${item.name} x${item.qty} = ${(item.price * item.qty).toFixed(2)}€`).join('\\n');\n}\n\nfunction cartTotal(cart) {\n  return cart.reduce((sum, i) => sum + i.price * i.qty, 0);\n}\n\nfunction buildMenu(prods) {\n  return prods.map((p, i) =>\n    `${i+1}. ${p.name} — ${p.price}€${p.stock_quantity < 5 ? ' ⚠️ stock limité' : ''}`\n  ).join('\\n');\n}\n\nfunction parseSelection(text, prods) {\n  // Formats acceptés : \"1\", \"1,2\", \"1 x2, 3 x1\", \"1x2 2x3\"\n  const items = [];\n  const pattern = /(\\d+)\\s*[xX×]?\\s*(\\d*)/g;\n  let match;\n  while ((match = pattern.exec(text)) !== null) {\n    const idx = parseInt(match[1]) - 1;\n    const qty = match[2] ? parseInt(match[2]) : 1;\n    if (idx >= 0 && idx < prods.length && qty > 0) {\n      const prod = prods[idx];\n      items.push({ id: prod.id, name: prod.name, price: prod.price, qty });\n    }\n  }\n  return items;\n}\n\nfunction checkStock(cart, prods) {\n  const issues = [];\n  for (const item of cart) {\n    const prod = prods.find(p => p.id === item.id);\n    if (prod && prod.stock_quantity < item.qty) {\n      issues.push(`${item.name} (demandé: ${item.qty}, stock: ${prod.stock_quantity})`);\n    }\n  }\n  return issues;\n}\n\n// ── Machine à états ──────────────────────────────────────────\nlet reply = '';\nlet newState = state;\nlet newContext = { ...context };\nlet createOrder = null;\nlet stockIssues = [];\n\nconst greetings = ['bonjour', 'salut', 'hello', 'bonsoir', 'hi', 'menu', 'start', 'commencer'];\nconst isGreeting = greetings.some(g => text.toLowerCase().includes(g));\n\n// Réinitialisation à tout moment si salutation\nif (isGreeting && state !== 'INITIAL') {\n  newState = 'INITIAL';\n  newContext = {};\n}\n\nswitch (newState) {\n  case 'INITIAL': {\n    const menu = buildMenu(products);\n    reply = `Bonjour ! 👋 Bienvenue chez *${tenant.name}*\\n\\n`\n           + `📋 *Notre menu :*\\n${menu}\\n\\n`\n           + `Tapez le numéro des plats et la quantité souhaitée.\\n`\n           + `Exemple : *1 x2, 3 x1* (plat 1 × 2 portions, plat 3 × 1 portion)`;\n    newState = 'BROWSE_MENU';\n    newContext = { cart: [] };\n    break;\n  }\n\n  case 'BROWSE_MENU': {\n    const parsed = parseSelection(text, products);\n    if (parsed.length === 0) {\n      reply = `Je n'ai pas compris votre sélection. 😕\\nTapez par exemple : *1 x2, 3 x1*`;\n      break;\n    }\n    const cart = [...(context.cart || []), ...parsed];\n    newContext = { ...newContext, cart };\n    const total = cartTotal(cart);\n    reply = `🛒 *Votre panier :*\\n${formatCart(cart)}\\n\\n*Total : ${total.toFixed(2)}€*\\n\\n`\n           + `Tapez *OK* pour continuer ou ajoutez d'autres plats.`;\n    newState = 'CART_REVIEW';\n    break;\n  }\n\n  case 'CART_REVIEW': {\n    if (text.toLowerCase() === 'ok') {\n      reply = `Parfait ! 😊 Quel est votre *nom complet* ?`;\n      newState = 'GET_NAME';\n    } else {\n      const parsed = parseSelection(text, products);\n      if (parsed.length > 0) {\n        const cart = [...(context.cart || []), ...parsed];\n        newContext = { ...newContext, cart };\n        const total = cartTotal(cart);\n        reply = `🛒 *Votre panier mis à jour :*\\n${formatCart(cart)}\\n\\n*Total : ${total.toFixed(2)}€*\\n\\nTapez *OK* pour continuer.`;\n      } else {\n        reply = `Tapez *OK* pour valider votre panier, ou envoyez des numéros de plats pour en ajouter.`;\n      }\n    }\n    break;\n  }\n\n  case 'GET_NAME': {\n    if (text.length < 2) {\n      reply = `Merci de saisir votre nom complet.`;\n      break;\n    }\n    newContext = { ...newContext, customerName: text };\n    reply = `Merci ${text} ! 🏠 Quelle est votre *adresse de livraison* ?`;\n    newState = 'GET_ADDRESS';\n    break;\n  }\n\n  case 'GET_ADDRESS': {\n    if (text.length < 5) {\n      reply = `Merci de saisir une adresse complète.`;\n      break;\n    }\n    newContext = { ...newContext, address: text };\n    reply = `📅 Pour quelle *date et heure* souhaitez-vous la livraison ?\\nEx : *Demain 12h* ou *15/06 à 13h30*`;\n    newState = 'GET_DATE';\n    break;\n  }\n\n  case 'GET_DATE': {\n    newContext = { ...newContext, deliveryDate: text };\n    const cart = context.cart || [];\n    const total = cartTotal(cart);\n    const recap = `👤 *Nom :* ${context.customerName}\\n`\n                + `🏠 *Adresse :* ${context.address}\\n`\n                + `📅 *Livraison :* ${text}\\n\\n`\n                + `🛒 *Commande :*\\n${formatCart(cart)}\\n\\n`\n                + `💰 *Total : ${total.toFixed(2)}€*`;\n    reply = `*Récapitulatif de votre commande :*\\n\\n${recap}\\n\\nTapez *OUI* pour confirmer ou *NON* pour annuler.`;\n    newState = 'CONFIRM';\n    break;\n  }\n\n  case 'CONFIRM': {\n    const answer = text.toLowerCase();\n    if (['oui', 'yes', 'o', 'ok', 'confirme', '✅'].includes(answer)) {\n      const cart = context.cart || [];\n      stockIssues = checkStock(cart, products);\n      if (stockIssues.length > 0) {\n        reply = `⚠️ Désolé, certains articles ne sont plus disponibles en quantité suffisante :\\n`\n               + stockIssues.map(s => `• ${s}`).join('\\n')\n               + `\\n\\nVotre commande est en attente de validation par notre équipe. Nous vous recontactons rapidement.`;\n        // On crée quand même la commande avec status 'stock_issue'\n        createOrder = { ...context, cart, status: 'stock_issue' };\n      } else {\n        reply = `✅ *Commande confirmée !*\\n\\nMerci ${context.customerName}, votre commande a bien été enregistrée. Notre équipe prépare votre livraison pour le ${context.deliveryDate}.\\n\\n📞 En cas de question : ${tenant.whatsapp_number}`;\n        createOrder = { ...context, cart, status: 'confirmed' };\n      }\n      newState = 'INITIAL';\n      newContext = {};\n    } else if (['non', 'no', 'n', 'annuler', '❌'].includes(answer)) {\n      reply = `Commande annulée. À bientôt ! 👋\\n\\nTapez *Bonjour* pour recommencer.`;\n      newState = 'INITIAL';\n      newContext = {};\n    } else {\n      reply = `Tapez *OUI* pour confirmer ou *NON* pour annuler.`;\n    }\n    break;\n  }\n\n  default: {\n    reply = `Bonjour ! Tapez *Menu* pour voir nos plats. 😊`;\n    newState = 'INITIAL';\n    newContext = {};\n  }\n}\n\nreturn [{\n  json: {\n    reply,\n    newState,\n    newContext,\n    createOrder,\n    stockIssues,\n    tenantId:          tenant.id,\n    tenantName:        tenant.name,\n    whatsappToken:     tenant.whatsapp_token,\n    phoneNumberId:     tenant.phone_number_id,\n    senderPhone:       phone,\n    sessionExists:     !!sessionData\n  }\n}];"
+        "jsCode": "const tenant   = $('Charger config tenant').item.json[0];\nconst products = $('Charger produits').all().map(i => i.json);\nconst sessions = $('Charger session').all();\nconst msg      = $('Extraire le message').item.json;\nconst sessionData = sessions.length ? sessions[0].json : null;\nconst state   = sessionData?.state   || 'INITIAL';\nconst context = sessionData?.context || {};\nconst phone = msg.senderPhone;\nconst text  = msg.messageText.trim();\n\nfunction formatCart(cart) {\n  return cart.map(item => `  • ${item.name} x${item.qty} = ${(item.price * item.qty).toLocaleString('fr-FR')} FCFA`).join('\\n');\n}\nfunction cartTotal(cart) {\n  return cart.reduce((sum, i) => sum + i.price * i.qty, 0);\n}\nfunction buildMenu(prods) {\n  return prods.map((p, i) =>\n    `${i+1}. ${p.name} — ${p.price.toLocaleString('fr-FR')} FCFA${p.stock_quantity < 5 ? ' ⚠️ stock limité' : ''}`\n  ).join('\\n');\n}\nfunction parseSelection(text, prods) {\n  const items = [];\n  const pattern = /(\\d+)\\s*[xX×]?\\s*(\\d*)/g;\n  let match;\n  while ((match = pattern.exec(text)) !== null) {\n    const idx = parseInt(match[1]) - 1;\n    const qty = match[2] ? parseInt(match[2]) : 1;\n    if (idx >= 0 && idx < prods.length && qty > 0) {\n      const prod = prods[idx];\n      items.push({ id: prod.id, name: prod.name, price: prod.price, qty });\n    }\n  }\n  return items;\n}\nfunction checkStock(cart, prods) {\n  const issues = [];\n  for (const item of cart) {\n    const prod = prods.find(p => p.id === item.id);\n    if (prod && prod.stock_quantity < item.qty) {\n      issues.push(`${item.name} (demandé: ${item.qty}, stock: ${prod.stock_quantity})`);\n    }\n  }\n  return issues;\n}\n\nlet reply = '';\nlet newState = state;\nlet newContext = { ...context };\nlet createOrder = null;\nlet stockIssues = [];\n\nconst greetings = ['bonjour', 'salut', 'hello', 'bonsoir', 'hi', 'menu', 'start', 'commencer'];\nconst isGreeting = greetings.some(g => text.toLowerCase().includes(g));\nif (isGreeting && state !== 'INITIAL') { newState = 'INITIAL'; newContext = {}; }\n\nswitch (newState) {\n  case 'INITIAL': {\n    const menu = buildMenu(products);\n    reply = `Bonjour ! 👋 Bienvenue chez *${tenant.name}*\\n\\n📋 *Notre menu :*\\n${menu}\\n\\nTapez le numéro des plats et la quantité.\\nExemple : *1 x2, 3 x1*`;\n    newState = 'BROWSE_MENU';\n    newContext = { cart: [] };\n    break;\n  }\n  case 'BROWSE_MENU': {\n    const parsed = parseSelection(text, products);\n    if (parsed.length === 0) { reply = `Je n'ai pas compris. Tapez par exemple : *1 x2, 3 x1*`; break; }\n    const cart = [...(context.cart || []), ...parsed];\n    newContext = { ...newContext, cart };\n    reply = `🛒 *Votre panier :*\\n${formatCart(cart)}\\n\\n*Total : ${cartTotal(cart).toLocaleString('fr-FR')} FCFA*\\n\\nTapez *OK* pour continuer.`;\n    newState = 'CART_REVIEW';\n    break;\n  }\n  case 'CART_REVIEW': {\n    if (text.toLowerCase() === 'ok') { reply = `Parfait 😊 Quel est votre *nom complet* ?`; newState = 'GET_NAME'; }\n    else {\n      const parsed = parseSelection(text, products);\n      if (parsed.length > 0) {\n        const cart = [...(context.cart || []), ...parsed];\n        newContext = { ...newContext, cart };\n        reply = `🛒 *Panier mis à jour :*\\n${formatCart(cart)}\\n\\n*Total : ${cartTotal(cart).toLocaleString('fr-FR')} FCFA*\\n\\nTapez *OK* pour continuer.`;\n      } else { reply = `Tapez *OK* pour valider ou envoyez des numéros pour ajouter des plats.`; }\n    }\n    break;\n  }\n  case 'GET_NAME': {\n    if (text.length < 2) { reply = `Merci de saisir votre nom complet.`; break; }\n    newContext = { ...newContext, customerName: text };\n    reply = `Merci ${text} ! 🏠 Quelle est votre *adresse de livraison* ?`;\n    newState = 'GET_ADDRESS';\n    break;\n  }\n  case 'GET_ADDRESS': {\n    if (text.length < 5) { reply = `Merci de saisir une adresse complète.`; break; }\n    newContext = { ...newContext, address: text };\n    reply = `📅 Pour quelle *date et heure* souhaitez-vous la livraison ?\\nEx : *Demain 12h* ou *15/06 à 13h30*`;\n    newState = 'GET_DATE';\n    break;\n  }\n  case 'GET_DATE': {\n    newContext = { ...newContext, deliveryDate: text };\n    const cart = context.cart || [];\n    const recap = `👤 *Nom :* ${context.customerName}\\n🏠 *Adresse :* ${context.address}\\n📅 *Livraison :* ${text}\\n\\n🛒 *Commande :*\\n${formatCart(cart)}\\n\\n💰 *Total : ${cartTotal(cart).toLocaleString('fr-FR')} FCFA*`;\n    reply = `*Récapitulatif :*\\n\\n${recap}\\n\\nTapez *OUI* pour confirmer ou *NON* pour annuler.`;\n    newState = 'CONFIRM';\n    break;\n  }\n  case 'CONFIRM': {\n    const answer = text.toLowerCase();\n    if (['oui', 'yes', 'o', 'ok', 'confirme', '✅'].includes(answer)) {\n      const cart = context.cart || [];\n      stockIssues = checkStock(cart, products);\n      if (stockIssues.length > 0) {\n        reply = `⚠️ Stock insuffisant :\\n${stockIssues.map(s => `• ${s}`).join('\\n')}\\n\\nCommande en attente de validation. Nous vous recontactons rapidement.`;\n        createOrder = { ...context, cart, status: 'stock_issue' };\n      } else {\n        reply = `✅ *Commande confirmée !*\\n\\nMerci ${context.customerName}, votre commande est enregistrée pour le ${context.deliveryDate}.\\n📞 En cas de question : ${tenant.whatsapp_number}`;\n        createOrder = { ...context, cart, status: 'confirmed' };\n      }\n      newState = 'INITIAL';\n      newContext = {};\n    } else if (['non', 'no', 'n', 'annuler', '❌'].includes(answer)) {\n      reply = `Commande annulée. À bientôt ! 👋\\n\\nTapez *Bonjour* pour recommencer.`;\n      newState = 'INITIAL';\n      newContext = {};\n    } else { reply = `Tapez *OUI* pour confirmer ou *NON* pour annuler.`; }\n    break;\n  }\n  default: {\n    reply = `Bonjour ! Tapez *Menu* pour voir nos plats. 😊`;\n    newState = 'INITIAL';\n    newContext = {};\n  }\n}\n\nreturn [{ json: { reply, newState, newContext, createOrder, stockIssues, tenantId: tenant.id, tenantName: tenant.name, whatsappToken: tenant.whatsapp_token, phoneNumberId: tenant.phone_number_id, senderPhone: phone, sessionExists: !!sessionData } }];"
       }
     },
     {
@@ -196,14 +191,8 @@
           ]
         },
         "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            { "name": "messaging_product", "value": "whatsapp" },
-            { "name": "to",               "value": "={{ $json.senderPhone }}" },
-            { "name": "type",             "value": "text" },
-            { "name": "text",             "value": "={ \"body\": {{ JSON.stringify($json.reply) }} }" }
-          ]
-        }
+        "contentType": "json",
+        "body": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: $json.senderPhone, type: 'text', text: { body: $json.reply } }) }}"
       }
     },
     {
@@ -227,7 +216,7 @@
         },
         "sendBody": true,
         "contentType": "json",
-        "body": "={\n  \"tenant_id\": \"{{ $('Bot Engine').item.json.tenantId }}\",\n  \"phone\":     \"{{ $('Bot Engine').item.json.senderPhone }}\",\n  \"state\":     \"{{ $('Bot Engine').item.json.newState }}\",\n  \"context\":   {{ JSON.stringify($('Bot Engine').item.json.newContext) }}\n}"
+        "body": "={{ JSON.stringify({ tenant_id: $('Bot Engine').item.json.tenantId, phone: $('Bot Engine').item.json.senderPhone, state: $('Bot Engine').item.json.newState, context: $('Bot Engine').item.json.newContext }) }}"
       }
     },
     {
@@ -269,7 +258,7 @@
         },
         "sendBody": true,
         "contentType": "json",
-        "body": "={\n  \"tenant_id\":        \"{{ $('Bot Engine').item.json.tenantId }}\",\n  \"order_number\":     \"ORD-{{ Date.now() }}\",\n  \"customer_name\":    {{ JSON.stringify($('Bot Engine').item.json.createOrder.customerName) }},\n  \"customer_phone\":   \"{{ $('Bot Engine').item.json.senderPhone }}\",\n  \"customer_address\": {{ JSON.stringify($('Bot Engine').item.json.createOrder.address) }},\n  \"delivery_date\":    null,\n  \"channel\":          \"whatsapp\",\n  \"status\":           \"{{ $('Bot Engine').item.json.createOrder.status }}\",\n  \"total\":            {{ $('Bot Engine').item.json.createOrder.cart.reduce((s,i) => s + i.price * i.qty, 0) }},\n  \"notes\":            \"Livraison demandée : {{ $('Bot Engine').item.json.createOrder.deliveryDate }}\"\n}"
+        "body": "={{ JSON.stringify({ tenant_id: $('Bot Engine').item.json.tenantId, order_number: 'ORD-WA-' + Date.now(), customer_name: $('Bot Engine').item.json.createOrder.customerName, customer_phone: $('Bot Engine').item.json.senderPhone, customer_address: $('Bot Engine').item.json.createOrder.address, delivery_date: null, channel: 'whatsapp', status: $('Bot Engine').item.json.createOrder.status, total: $('Bot Engine').item.json.createOrder.cart.reduce((s,i) => s + i.price * i.qty, 0), notes: 'Livraison demandée : ' + $('Bot Engine').item.json.createOrder.deliveryDate }) }}"
       }
     },
     {
@@ -279,7 +268,7 @@
       "typeVersion": 2,
       "position": [3580, 100],
       "parameters": {
-        "jsCode": "const order     = $('Créer commande en DB').item.json[0] || $('Créer commande en DB').item.json;\nconst orderId   = order.id;\nconst cart      = $('Bot Engine').item.json.createOrder.cart;\n\nconst items = cart.map(item => ({\n  order_id:      orderId,\n  product_id:    item.id || null,\n  product_name:  item.name,\n  product_price: item.price,\n  quantity:      item.qty,\n  subtotal:      item.price * item.qty\n}));\n\nreturn [{ json: { items, orderId } }];"
+        "jsCode": "const order   = $('Créer commande en DB').item.json[0] ?? $('Créer commande en DB').item.json;\nconst orderId = order.id;\nconst cart    = $('Bot Engine').item.json.createOrder.cart;\nconst items   = cart.map(item => ({ order_id: orderId, product_id: item.id || null, product_name: item.name, product_price: item.price, quantity: item.qty, subtotal: item.price * item.qty }));\nreturn [{ json: { items, orderId, livreur_id: order.livreur_id ?? null } }];"
       }
     },
     {
@@ -306,14 +295,32 @@
       }
     },
     {
-      "id": "node-get-livreur",
-      "name": "Charger livreur disponible",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
+      "id": "node-check-livreur-assigned",
+      "name": "Livreur assigné?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
       "position": [4100, 100],
       "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $('Créer lignes de commande').item.json.livreur_id }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "node-get-livreur",
+      "name": "Charger livreur assigné",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [4360, 60],
+      "parameters": {
         "method": "GET",
-        "url": "={{ $env.SUPABASE_URL }}/rest/v1/livreurs?tenant_id=eq.{{ $('Bot Engine').item.json.tenantId }}&is_active=eq.true&select=*&limit=1",
+        "url": "={{ $env.SUPABASE_URL }}/rest/v1/livreurs?id=eq.{{ $('Créer lignes de commande').item.json.livreur_id }}&select=id,name,phone",
         "authentication": "genericCredentialType",
         "genericAuthType": "httpHeaderAuth",
         "sendHeaders": true,
@@ -330,7 +337,7 @@
       "name": "Notifier le livreur",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [4360, 100],
+      "position": [4620, 60],
       "parameters": {
         "method": "POST",
         "url": "=https://graph.facebook.com/v19.0/{{ $('Bot Engine').item.json.phoneNumberId }}/messages",
@@ -345,37 +352,41 @@
         },
         "sendBody": true,
         "contentType": "json",
-        "body": "={\n  \"messaging_product\": \"whatsapp\",\n  \"to\": \"{{ $json[0]?.phone || '' }}\",\n  \"type\": \"text\",\n  \"text\": {\n    \"body\": \"🚚 *Nouvelle commande !*\\n\\nClient : {{ $('Bot Engine').item.json.createOrder.customerName }}\\nAdresse : {{ $('Bot Engine').item.json.createOrder.address }}\\nLivraison : {{ $('Bot Engine').item.json.createOrder.deliveryDate }}\\n\\nVoir le tableau de bord pour les détails.\"\n  }\n}"
+        "body": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: String($json[0].phone).replace(/[^0-9]/g, ''), type: 'text', text: { body: '🛵 *Nouvelle livraison assignée !*\\n\\n📦 Commande : ' + ($('Créer commande en DB').item.json[0] ?? $('Créer commande en DB').item.json).order_number + '\\n👤 Client : ' + $('Bot Engine').item.json.createOrder.customerName + '\\n📱 Tél. : ' + $('Bot Engine').item.json.senderPhone + '\\n📍 Adresse : ' + $('Bot Engine').item.json.createOrder.address + '\\n📅 Livraison : ' + $('Bot Engine').item.json.createOrder.deliveryDate + '\\n💰 Total : ' + Number(($('Créer commande en DB').item.json[0] ?? $('Créer commande en DB').item.json).total).toLocaleString('fr-FR') + ' FCFA\\n\\nRépondez *OK* pour confirmer la prise en charge.' } }) }}"
       }
     }
   ],
   "connections": {
-    "WhatsApp Webhook":          { "main": [[{ "node": "GET ou POST?",               "type": "main", "index": 0 }]] },
-    "GET ou POST?":              { "main": [
-                                    [{ "node": "ACK 200 à Meta",              "type": "main", "index": 0 }],
-                                    [{ "node": "Vérification Meta",            "type": "main", "index": 0 }]
-                                  ]},
-    "Vérification Meta":         { "main": [[{ "node": "Répondre à Meta",             "type": "main", "index": 0 }]] },
-    "ACK 200 à Meta":            { "main": [[{ "node": "Extraire le message",          "type": "main", "index": 0 }]] },
-    "Extraire le message":       { "main": [[{ "node": "Charger config tenant",        "type": "main", "index": 0 }]] },
-    "Charger config tenant":     { "main": [[{ "node": "Tenant trouvé?",               "type": "main", "index": 0 }]] },
-    "Tenant trouvé?":            { "main": [
-                                    [{ "node": "Charger produits",            "type": "main", "index": 0 }],
-                                    [{ "node": "Ignorer (tenant inconnu)",    "type": "main", "index": 0 }]
-                                  ]},
-    "Charger produits":          { "main": [[{ "node": "Charger session",               "type": "main", "index": 0 }]] },
-    "Charger session":           { "main": [[{ "node": "Bot Engine",                    "type": "main", "index": 0 }]] },
-    "Bot Engine":                { "main": [[{ "node": "Envoyer réponse WhatsApp",      "type": "main", "index": 0 }]] },
-    "Envoyer réponse WhatsApp":  { "main": [[{ "node": "Sauvegarder session",           "type": "main", "index": 0 }]] },
-    "Sauvegarder session":       { "main": [[{ "node": "Créer une commande?",           "type": "main", "index": 0 }]] },
-    "Créer une commande?":       { "main": [
-                                    [{ "node": "Créer commande en DB",        "type": "main", "index": 0 }],
-                                    []
-                                  ]},
-    "Créer commande en DB":      { "main": [[{ "node": "Créer lignes de commande",      "type": "main", "index": 0 }]] },
-    "Créer lignes de commande":  { "main": [[{ "node": "Insérer lignes en DB",          "type": "main", "index": 0 }]] },
-    "Insérer lignes en DB":      { "main": [[{ "node": "Charger livreur disponible",    "type": "main", "index": 0 }]] },
-    "Charger livreur disponible":{ "main": [[{ "node": "Notifier le livreur",           "type": "main", "index": 0 }]] }
+    "WhatsApp Webhook":         { "main": [[{ "node": "GET ou POST?",              "type": "main", "index": 0 }]] },
+    "GET ou POST?":             { "main": [
+                                   [{ "node": "ACK 200 à Meta",             "type": "main", "index": 0 }],
+                                   [{ "node": "Vérification Meta",           "type": "main", "index": 0 }]
+                                 ]},
+    "Vérification Meta":        { "main": [[{ "node": "Répondre à Meta",            "type": "main", "index": 0 }]] },
+    "ACK 200 à Meta":           { "main": [[{ "node": "Extraire le message",         "type": "main", "index": 0 }]] },
+    "Extraire le message":      { "main": [[{ "node": "Charger config tenant",       "type": "main", "index": 0 }]] },
+    "Charger config tenant":    { "main": [[{ "node": "Tenant trouvé?",              "type": "main", "index": 0 }]] },
+    "Tenant trouvé?":           { "main": [
+                                   [{ "node": "Charger produits",           "type": "main", "index": 0 }],
+                                   [{ "node": "Ignorer (tenant inconnu)",   "type": "main", "index": 0 }]
+                                 ]},
+    "Charger produits":         { "main": [[{ "node": "Charger session",              "type": "main", "index": 0 }]] },
+    "Charger session":          { "main": [[{ "node": "Bot Engine",                   "type": "main", "index": 0 }]] },
+    "Bot Engine":               { "main": [[{ "node": "Envoyer réponse WhatsApp",     "type": "main", "index": 0 }]] },
+    "Envoyer réponse WhatsApp": { "main": [[{ "node": "Sauvegarder session",          "type": "main", "index": 0 }]] },
+    "Sauvegarder session":      { "main": [[{ "node": "Créer une commande?",          "type": "main", "index": 0 }]] },
+    "Créer une commande?":      { "main": [
+                                   [{ "node": "Créer commande en DB",       "type": "main", "index": 0 }],
+                                   []
+                                 ]},
+    "Créer commande en DB":     { "main": [[{ "node": "Créer lignes de commande",     "type": "main", "index": 0 }]] },
+    "Créer lignes de commande": { "main": [[{ "node": "Insérer lignes en DB",         "type": "main", "index": 0 }]] },
+    "Insérer lignes en DB":     { "main": [[{ "node": "Livreur assigné?",             "type": "main", "index": 0 }]] },
+    "Livreur assigné?":         { "main": [
+                                   [{ "node": "Charger livreur assigné",    "type": "main", "index": 0 }],
+                                   []
+                                 ]},
+    "Charger livreur assigné":  { "main": [[{ "node": "Notifier le livreur",          "type": "main", "index": 0 }]] }
   },
   "settings": {
     "executionOrder": "v1",
