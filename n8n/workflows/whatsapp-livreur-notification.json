@@ -1,0 +1,96 @@
+{
+  "name": "OrderFlow — Notification WhatsApp Livreur",
+  "nodes": [
+    {
+      "id": "node-webhook-livreur",
+      "name": "Webhook Livreur Assigné",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "parameters": {
+        "path": "livreur-assigned",
+        "httpMethod": "POST",
+        "responseMode": "onReceived",
+        "options": {}
+      }
+    },
+    {
+      "id": "node-format-data",
+      "name": "Formater données",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300],
+      "parameters": {
+        "jsCode": "const data = $input.first().json.body ?? $input.first().json;\n\n// Normaliser le téléphone pour WhatsApp (chiffres uniquement, sans +)\nfunction normalizePhone(phone) {\n  return String(phone || '').replace(/[^0-9]/g, '');\n}\n\nconst livreurPhone = normalizePhone(data.livreur_phone);\n\nif (!livreurPhone) {\n  throw new Error('livreur_phone manquant ou invalide : ' + data.livreur_phone);\n}\n\nif (!data.phone_number_id || !data.whatsapp_token) {\n  throw new Error('Credentials WhatsApp manquants (phone_number_id / whatsapp_token)');\n}\n\nconst montant = data.total != null\n  ? Number(data.total).toLocaleString('fr-FR') + ' FCFA'\n  : 'À calculer';\n\nconst adresse = data.customer_address || 'Non précisée';\nconst notes   = data.notes ? `\\n📝 Notes : ${data.notes}` : '';\n\nconst messageBody = [\n  '🛵 *Nouvelle livraison assignée !*',\n  '',\n  `📦 Commande : ${data.order_number}`,\n  `👤 Client : ${data.customer_name}`,\n  `📱 Tél. : ${data.customer_phone}`,\n  `📍 Adresse : ${adresse}`,\n  `💰 Total : ${montant}${notes}`,\n  '',\n  'Répondez *OK* pour confirmer la prise en charge.'\n].join('\\n');\n\nreturn [{\n  json: {\n    livreur_phone:   livreurPhone,\n    message_body:    messageBody,\n    phone_number_id: data.phone_number_id,\n    whatsapp_token:  data.whatsapp_token,\n    order_number:    data.order_number,\n    livreur_name:    data.livreur_name\n  }\n}];"
+      }
+    },
+    {
+      "id": "node-send-whatsapp",
+      "name": "Envoyer WhatsApp au livreur",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 300],
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/{{ $json.phone_number_id }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.whatsapp_token }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  messaging_product: 'whatsapp',\n  to: $json.livreur_phone,\n  type: 'text',\n  text: { body: $json.message_body }\n}) }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": "node-log-result",
+      "name": "Log résultat",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 300],
+      "parameters": {
+        "jsCode": "const result = $input.first().json;\nconst success = result.messages?.length > 0;\n\nif (!success) {\n  console.error('Échec envoi WhatsApp livreur :', JSON.stringify(result));\n} else {\n  console.log('WhatsApp livreur envoyé :', result.messages[0]?.id);\n}\n\nreturn $input.all();"
+      }
+    }
+  ],
+  "connections": {
+    "Webhook Livreur Assigné": {
+      "main": [[{ "node": "Formater données", "type": "main", "index": 0 }]]
+    },
+    "Formater données": {
+      "main": [[{ "node": "Envoyer WhatsApp au livreur", "type": "main", "index": 0 }]]
+    },
+    "Envoyer WhatsApp au livreur": {
+      "main": [[{ "node": "Log résultat", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "saveExecutionProgress": true,
+    "executionTimeout": 10
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCreatedBy": "OrderFlow SaaS"
+  },
+  "id": "orderflow-livreur-notification",
+  "tags": ["orderflow", "livreur", "whatsapp"]
+}
